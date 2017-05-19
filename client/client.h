@@ -13,12 +13,12 @@ class Client: public QTcpSocket
 {
     Q_OBJECT
 public:
-    Client(QListWidget* listClosed, QListWidget* listOpened);
+    Client(QListWidget* listForOpen, QListWidget* listOpened);
     void onConnect(const QHostAddress &adr, qint16 port);
     void sendCommand(const QString& command, const qint64 &index);
     void sendOpen(const qint64& index);
     void sendClose(const qint64& index);
-    void changeList();
+    void ChangeList();
     void ChangeList(QString command, qint64 index);
 private slots:
     void onServerMessage();
@@ -42,7 +42,7 @@ private:
     QVector<Program> programs;
 
     qint64 bufferSize = 0;
-    QListWidget* listClosed;
+    QListWidget* listForOpen;
     QListWidget* listOpened;
 
     void addItem(bool isOpen, Program program, qint64 index);

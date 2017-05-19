@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    client = new Client(ui->listClosed, ui->listOpened);
-    client->connectToHost(QHostAddress("192.168.1.105"), 3000);
+    client = new Client(ui->listForOpen, ui->listOpened);
+    client->connectToHost(QHostAddress("127.0.0.1"), 3000);
 }
 
 MainWindow::~MainWindow()
@@ -15,63 +15,30 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/*void MainWindow::addItem(bool isOpen, Client::Program program, int index)
-{
-    QListWidgetItem *wi = new QListWidgetItem(program.name);
-    QVariant v;
-    v.setValue(index);
 
-    wi->setData(Qt::UserRole, v);
-    if(isOpen){
-        ui->listOpened->addItem(wi);
-    }
-    else{
-        ui->listClosed->addItem(wi);
-    }
-}
 
-void MainWindow::removeItem(bool isOpen, Client::Program program, int index)
+void MainWindow::on_listForOpen_doubleClicked(const QModelIndex &index)
 {
-    QList<QListWidgetItem*> l;
+    int i = ui->listForOpen->currentRow();
     QListWidgetItem* it;
-    if(isOpen){
-        l = ui->listOpened->findItems(program.name, Qt::MatchExactly);
-        if(l.size() != 0 ){
-            it = l.first();
-            int row = ui->listOpened->row(it);
-            delete ui->listOpened->takeItem(row);
-        }
-    }
-    else{
-        l = ui->listClosed->findItems(program.name, Qt::MatchExactly);
-        if(l.size() != 0 ){
-            it = l.first();
-            int row  = ui->listClosed->row(it);
-            delete ui->listClosed->takeItem(row);
-        }
-    }
-}*/
-
-void MainWindow::on_listClosed_doubleClicked(const QModelIndex &index)
-{
-    int i = ui->listClosed->currentRow();
-    QListWidgetItem* it = ui->listClosed->takeItem(i);
-
+    it = ui->listForOpen->item(i);
 
     QVariant v = it->data(Qt::UserRole);
     int ind = v.value<qint64>();
 
-    client->sendCommand("Open", ind);
+    client->sendOpen(ind);
 }
+
 
 void MainWindow::on_listOpened_doubleClicked(const QModelIndex &index)
 {
-    int i = ui->listClosed->currentRow();
-    QListWidgetItem* it = ui->listClosed->takeItem(i);
+    int i = ui->listOpened->currentRow();
+    QListWidgetItem* it = ui->listOpened->takeItem(i);
 
 
     QVariant v = it->data(Qt::UserRole);
     int ind = v.value<qint64>();
 
-    client->sendCommand("Close", ind);
+    client->sendClose(ind);
 }
+

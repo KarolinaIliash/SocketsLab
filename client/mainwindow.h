@@ -23,10 +23,8 @@ private:
     Ui::MainWindow *ui;
     Client* client;
 public:
-   //void addItem(bool isOpen, Program program, int index);
-   //void removeItem(bool isOpen, Program program, int index);
 private slots:
-    void on_listClosed_doubleClicked(const QModelIndex &index);
+    void on_listForOpen_doubleClicked(const QModelIndex &index);
     void on_listOpened_doubleClicked(const QModelIndex &index);
 };
 

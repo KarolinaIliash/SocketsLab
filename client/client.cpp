@@ -2,11 +2,9 @@
 
 #include <QDebug>
 
-Client::Client(QListWidget* listClosed, QListWidget* listOpened)
+Client::Client(QListWidget* listForOpen, QListWidget* listOpened)
 {
-    //this->mw = mw;
-    //mw = parent;
-    this->listClosed = listClosed;
+    this->listForOpen = listForOpen;
     this->listOpened = listOpened;
     connect(this, SIGNAL(readyRead()), this, SLOT(onServerMessage()));
     connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -26,8 +24,9 @@ void Client::sendCommand(const QString& command, const qint64 &index)
     out << index;
     out.device()->seek(0);
     out << (qint64)(buffer.size() - sizeof(qint64));
-    write(buffer);
     qDebug() << buffer.size() - sizeof(qint64);
+    write(buffer);
+
 }
 
 void Client::sendOpen(const qint64 &index)
@@ -42,54 +41,46 @@ void Client::sendClose(const qint64 &index)
     sendCommand(command, index);
 }
 
-void Client::changeList()
+void Client::ChangeList()
 {
     for(int i = 0; i < programs.size(); i++){
-        if(programs[i].isOpened){
-
             addItem(true, programs[i], i);
+            if(programs[i].isOpened)
+                addItem(false, programs[i], i);
+    }
+}
+
+void Client::ChangeList(QString command, qint64 index)
+{
+        if(command == "Opened"){
+            addItem(false, programs[index], index);
         }
         else{
-            addItem(false, programs[i], i);
+            removeItem(false, programs[index], index);
         }
-    }
-}
-
-void Client::ChangeList(QString command,qint64 index)
-{
-    if(command == "Opened"){
-        addItem(true, programs[index], index);
-        removeItem(false, programs[index], index);
-    }
-    else{
-        addItem(false, programs[index], index);
-        removeItem(true, programs[index], index);
-    }
 }
 
 
-void Client::addItem(bool isOpen, Program program, qint64 index)
+void Client::addItem(bool isForOpen, Program program, qint64 index)
 {
     QListWidgetItem *wi = new QListWidgetItem(program.name);
     QVariant v;
     v.setValue(index);
 
     wi->setData(Qt::UserRole, v);
-    if(isOpen){
-         listOpened->addItem(wi);
+    if(isForOpen){
+        listForOpen->addItem(wi);
     }
     else{
-        listClosed->addItem(wi);
+        listOpened->addItem(wi);
     }
 }
 
-void Client::removeItem(bool isOpen, Program program, qint64 index)
+void Client::removeItem(bool isForOpen, Program program, qint64 index)
 {
     QList<QListWidgetItem*> l;
     QListWidgetItem* it;
-    if(isOpen){
-
-
+    if(!isForOpen){
         l = listOpened->findItems(program.name, Qt::MatchExactly);
         if(l.size() != 0 ){
             it = l.first();
@@ -98,11 +89,11 @@ void Client::removeItem(bool isOpen, Program program, qint64 index)
         }
     }
     else{
-        l =  listClosed->findItems(program.name, Qt::MatchExactly);
+        l =  listForOpen->findItems(program.name, Qt::MatchExactly);
         if(l.size() != 0 ){
             it = l.first();
-            int row  = listClosed->row(it);
-            delete  listClosed->takeItem(row);
+            int row  = listForOpen->row(it);
+            delete  listForOpen->takeItem(row);
         }
     }
 }
@@ -131,13 +122,13 @@ void Client::onServerMessage()
             in >> p;
             programs  << p;
         }
-        changeList();
+        ChangeList();
     }
     else if(command == "Opened" || command == "Closed"){
-        qint64 index;
-        in >> index;
-        ChangeList(command, index);
-    }
+            qint64 index;
+            in >> index;
+            ChangeList(command, index);
+         }
 }
 
 void Client::onConnected()

@@ -25,7 +25,7 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QListWidget" name="listClosed"/>
+      <widget class="QListWidget" name="listForOpen"/>
      </item>
      <item>
       <widget class="QListWidget" name="listOpened"/>

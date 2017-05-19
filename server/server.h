@@ -10,7 +10,8 @@ class Server: public QTcpServer
 {
     Q_OBJECT
 private:
-    QList<QTcpSocket*> clients;
+    QVector<QTcpSocket*> clients;
+    QVector<qint64> bufsize;
 public:
     Server();
     void open(qint16 port);
@@ -22,25 +23,27 @@ private:
     struct Program{
         QString name;
         QString address;
+        QString prName;
+        QProcess* proc = nullptr;
         bool isOpened = false;
 
         Program(){}
 
-        Program(QString pname, QString paddress, bool pisOpened = false){
+        Program(QString pname, QString paddress, QString pprName){
             name = pname;
             address = paddress;
-            isOpened = pisOpened;
+            prName = pprName;
         }
 
         friend QDataStream &operator<<(QDataStream &out, const Program &p){
-            out << p.name << p.isOpened;
+            out << p.prName << p.isOpened;
             return out;
         }
     };
 
     QVector<Program> programs;
 
-    qint64 bufferSize = 0;
+    //qint64 bufferSize = 0;
 private:
     void SendList(QTcpSocket* soc);
     void SendInfo(QString name, qint64 index);
