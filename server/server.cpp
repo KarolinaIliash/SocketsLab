@@ -46,7 +46,7 @@ Server::Server()
     programs.push_back(prog);
     prog.address = "C:\\Program Files (x86)\\Microsoft Office\\Office12";
     prog.name = "OIS";
-    prog.prName = "Microsft Office Picture Manager";
+    prog.prName = "Microsoft Office Picture Manager";
     programs.push_back(prog);
     prog.address = "C:\\Program Files (x86)\\Microsoft Office\\Office12";
     prog.name = "POWERPNT";
@@ -85,7 +85,6 @@ void Server::onNewConnection()
 
 void Server::onClientMessage(){
     qDebug()<<"Message";
-    //this->CloseProgram(0);
     QTcpSocket* soc = qobject_cast<QTcpSocket*>(sender());
     if(soc == nullptr) return;
     int ind = clients.indexOf(soc);
@@ -169,6 +168,7 @@ void Server::CloseProgram(qint64 index)
     if(programs[index].isOpened){
         programs[index].proc->kill();
         programs[index].isOpened = false;
+        delete programs[index].proc;
         programs[index].proc = nullptr;
     }
     programs[index].isOpened = false;

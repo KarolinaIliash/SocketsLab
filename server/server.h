@@ -14,6 +14,7 @@ private:
     QVector<qint64> bufsize;
 public:
     Server();
+    ~Server() {}
     void open(qint16 port);
 private slots:
     void onNewConnection();
@@ -29,6 +30,10 @@ private:
 
         Program(){}
 
+        ~Program(){
+            delete proc;
+        }
+
         Program(QString pname, QString paddress, QString pprName){
             name = pname;
             address = paddress;
@@ -42,8 +47,6 @@ private:
     };
 
     QVector<Program> programs;
-
-    //qint64 bufferSize = 0;
 private:
     void SendList(QTcpSocket* soc);
     void SendInfo(QString name, qint64 index);
